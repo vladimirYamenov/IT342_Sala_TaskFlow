@@ -26,4 +26,8 @@ public class User {
 
     @Column(name = "full_name")
     private String fullName;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private String role = "USER";
 }
