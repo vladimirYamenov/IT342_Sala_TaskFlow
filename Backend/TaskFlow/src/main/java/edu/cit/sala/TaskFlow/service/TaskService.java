@@ -9,10 +9,12 @@ import edu.cit.sala.TaskFlow.repository.GroupRepository;
 import edu.cit.sala.TaskFlow.repository.GroupMemberRepository;
 import edu.cit.sala.TaskFlow.repository.TaskRepository;
 import edu.cit.sala.TaskFlow.service.builder.TaskBuilder;
+import edu.cit.sala.TaskFlow.service.observer.TaskEvent;
 import edu.cit.sala.TaskFlow.service.strategy.GroupTaskFilterStrategy;
 import edu.cit.sala.TaskFlow.service.strategy.TaskFilterStrategy;
 import edu.cit.sala.TaskFlow.service.strategy.UserTaskFilterStrategy;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -23,6 +25,7 @@ import java.util.List;
  * Refactored to use multiple design patterns:
  * - Builder Pattern: Task construction (TaskBuilder)
  * - Strategy Pattern: Task filtering (TaskFilterStrategy)
+ * - Observer Pattern: Task lifecycle events (TaskEvent)
  */
 @Service
 @RequiredArgsConstructor
@@ -31,6 +34,7 @@ public class TaskService {
     private final TaskRepository taskRepository;
     private final GroupRepository groupRepository;
     private final GroupMemberRepository groupMemberRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     /**
      * Refactored to use the Builder Pattern via TaskBuilder.
@@ -59,6 +63,8 @@ public class TaskService {
                     .build();
 
             Task saved = taskRepository.save(task);
+            // Observer Pattern: publish event so listeners can react
+            eventPublisher.publishEvent(new TaskEvent(this, saved, TaskEvent.Type.CREATED));
             return toResponse(saved);
         } catch (IllegalArgumentException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
@@ -102,6 +108,12 @@ public class TaskService {
         if (request.getDueDate() != null) task.setDueDate(request.getDueDate());
 
         Task updated = taskRepository.save(task);
+
+        // Observer Pattern: detect if task was completed and publish appropriate event
+        TaskEvent.Type eventType = "COMPLETED".equals(request.getStatus())
+                ? TaskEvent.Type.COMPLETED : TaskEvent.Type.UPDATED;
+        eventPublisher.publishEvent(new TaskEvent(this, updated, eventType));
+
         return toResponse(updated);
     }
 
@@ -114,6 +126,8 @@ public class TaskService {
         }
 
         taskRepository.delete(task);
+        // Observer Pattern: notify listeners of deletion
+        eventPublisher.publishEvent(new TaskEvent(this, task, TaskEvent.Type.DELETED));
     }
 
     /**
