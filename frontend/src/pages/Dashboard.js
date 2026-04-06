@@ -1,30 +1,31 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { taskApi, groupApi } from '../api';
+import { dashboardApi } from '../api';
 
+/**
+ * Facade Pattern (Frontend integration):
+ * Before: Dashboard made TWO separate API calls (taskApi.list + groupApi.list)
+ * and computed stats (total, completed, pending, inProgress) on the client.
+ * After: A single dashboardApi.get() call returns all data pre-aggregated
+ * by the DashboardFacade on the backend.
+ */
 export default function Dashboard({ user }) {
-  const [tasks, setTasks] = useState([]);
-  const [groups, setGroups] = useState([]);
+  const [dashboard, setDashboard] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    Promise.all([
-      taskApi.list().catch(() => []),
-      groupApi.list().catch(() => []),
-    ]).then(([t, g]) => {
-      setTasks(Array.isArray(t) ? t : []);
-      setGroups(Array.isArray(g) ? g : []);
-    }).finally(() => setLoading(false));
+    dashboardApi.get()
+      .then((data) => setDashboard(data))
+      .catch(() => setDashboard(null))
+      .finally(() => setLoading(false));
   }, []);
 
-  const total = tasks.length;
-  const completed = tasks.filter((t) => t.status === 'COMPLETED').length;
-  const pending = tasks.filter((t) => t.status === 'PENDING' || t.status === 'TODO').length;
-  const inProgress = tasks.filter((t) => t.status === 'IN_PROGRESS').length;
-
-  const recentTasks = [...tasks]
-    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-    .slice(0, 5);
+  const total = dashboard?.totalTasks || 0;
+  const completed = dashboard?.completedTasks || 0;
+  const pending = dashboard?.pendingTasks || 0;
+  const inProgress = dashboard?.inProgressTasks || 0;
+  const recentTasks = dashboard?.recentTasks || [];
+  const groups = dashboard?.groups || [];
 
   const priorityBadge = (p) => {
     const map = { HIGH: 'badge-danger', MEDIUM: 'badge-warning', LOW: 'badge-info' };
