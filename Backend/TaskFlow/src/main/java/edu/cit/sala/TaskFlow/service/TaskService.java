@@ -8,6 +8,7 @@ import edu.cit.sala.TaskFlow.entity.User;
 import edu.cit.sala.TaskFlow.repository.GroupRepository;
 import edu.cit.sala.TaskFlow.repository.GroupMemberRepository;
 import edu.cit.sala.TaskFlow.repository.TaskRepository;
+import edu.cit.sala.TaskFlow.service.builder.TaskBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -23,11 +24,12 @@ public class TaskService {
     private final GroupRepository groupRepository;
     private final GroupMemberRepository groupMemberRepository;
 
+    /**
+     * Refactored to use the Builder Pattern via TaskBuilder.
+     * Before: inline Task.builder() with scattered null-checks for defaults.
+     * After: TaskBuilder handles defaults and validation internally.
+     */
     public TaskResponse createTask(TaskRequest request, User user) {
-        if (request.getTitle() == null || request.getTitle().isBlank()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Task title is required");
-        }
-
         Group group = null;
         if (request.getGroupId() != null) {
             group = groupRepository.findById(request.getGroupId())
@@ -37,18 +39,22 @@ public class TaskService {
             }
         }
 
-        Task task = Task.builder()
-                .title(request.getTitle())
-                .description(request.getDescription())
-                .priority(request.getPriority() != null ? request.getPriority() : "MEDIUM")
-                .status(request.getStatus() != null ? request.getStatus() : "TODO")
-                .dueDate(request.getDueDate())
-                .user(user)
-                .group(group)
-                .build();
+        try {
+            Task task = new TaskBuilder()
+                    .title(request.getTitle())
+                    .description(request.getDescription())
+                    .priority(request.getPriority())
+                    .status(request.getStatus())
+                    .dueDate(request.getDueDate())
+                    .user(user)
+                    .group(group)
+                    .build();
 
-        Task saved = taskRepository.save(task);
-        return toResponse(saved);
+            Task saved = taskRepository.save(task);
+            return toResponse(saved);
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
     }
 
     public List<TaskResponse> getUserTasks(Long userId, String status, String priority) {
