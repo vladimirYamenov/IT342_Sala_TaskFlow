@@ -9,6 +9,9 @@ import edu.cit.sala.TaskFlow.repository.GroupRepository;
 import edu.cit.sala.TaskFlow.repository.GroupMemberRepository;
 import edu.cit.sala.TaskFlow.repository.TaskRepository;
 import edu.cit.sala.TaskFlow.service.builder.TaskBuilder;
+import edu.cit.sala.TaskFlow.service.strategy.GroupTaskFilterStrategy;
+import edu.cit.sala.TaskFlow.service.strategy.TaskFilterStrategy;
+import edu.cit.sala.TaskFlow.service.strategy.UserTaskFilterStrategy;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -16,6 +19,11 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
+/**
+ * Refactored to use multiple design patterns:
+ * - Builder Pattern: Task construction (TaskBuilder)
+ * - Strategy Pattern: Task filtering (TaskFilterStrategy)
+ */
 @Service
 @RequiredArgsConstructor
 public class TaskService {
@@ -57,19 +65,14 @@ public class TaskService {
         }
     }
 
+    /**
+     * Strategy Pattern applied: delegates filtering to UserTaskFilterStrategy.
+     * Before: inline if-else chain choosing between 4 repository methods.
+     * After: strategy object encapsulates the filter selection logic.
+     */
     public List<TaskResponse> getUserTasks(Long userId, String status, String priority) {
-        List<Task> tasks;
-
-        if (status != null && priority != null) {
-            tasks = taskRepository.findByUserIdAndStatusAndPriorityOrderByCreatedAtDesc(userId, status, priority);
-        } else if (status != null) {
-            tasks = taskRepository.findByUserIdAndStatusOrderByCreatedAtDesc(userId, status);
-        } else if (priority != null) {
-            tasks = taskRepository.findByUserIdAndPriorityOrderByCreatedAtDesc(userId, priority);
-        } else {
-            tasks = taskRepository.findByUserIdOrderByCreatedAtDesc(userId);
-        }
-
+        TaskFilterStrategy strategy = new UserTaskFilterStrategy(taskRepository);
+        List<Task> tasks = strategy.filter(userId, status, priority);
         return tasks.stream().map(this::toResponse).toList();
     }
 
@@ -113,21 +116,17 @@ public class TaskService {
         taskRepository.delete(task);
     }
 
+    /**
+     * Strategy Pattern applied: delegates filtering to GroupTaskFilterStrategy.
+     * Same benefit as getUserTasks — encapsulated filter logic, easily extensible.
+     */
     public List<TaskResponse> getGroupTasks(Long groupId, Long userId, String status, String priority) {
         if (!groupMemberRepository.existsByGroupIdAndUserId(groupId, userId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not a member of this group");
         }
 
-        List<Task> tasks;
-        if (status != null && priority != null) {
-            tasks = taskRepository.findByGroupIdAndStatusAndPriorityOrderByCreatedAtDesc(groupId, status, priority);
-        } else if (status != null) {
-            tasks = taskRepository.findByGroupIdAndStatusOrderByCreatedAtDesc(groupId, status);
-        } else if (priority != null) {
-            tasks = taskRepository.findByGroupIdAndPriorityOrderByCreatedAtDesc(groupId, priority);
-        } else {
-            tasks = taskRepository.findByGroupIdOrderByCreatedAtDesc(groupId);
-        }
+        TaskFilterStrategy strategy = new GroupTaskFilterStrategy(taskRepository);
+        List<Task> tasks = strategy.filter(groupId, status, priority);
 
         return tasks.stream().map(this::toResponse).toList();
     }
