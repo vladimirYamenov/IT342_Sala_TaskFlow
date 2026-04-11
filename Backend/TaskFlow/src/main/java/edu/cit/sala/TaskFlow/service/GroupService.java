@@ -61,6 +61,38 @@ public class GroupService {
         return toResponse(group);
     }
 
+    public GroupResponse addMemberByEmail(Long groupId, String email, Long requestingUserId) {
+        if (email == null || email.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email is required");
+        }
+
+        Group group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Group not found"));
+
+        GroupMember requester = groupMemberRepository.findByGroupIdAndUserId(groupId, requestingUserId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not a member of this group"));
+
+        if (!"ADMIN".equals(requester.getRole())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only admins can add members");
+        }
+
+        User targetUser = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No user found with email: " + email));
+
+        if (groupMemberRepository.existsByGroupIdAndUserId(groupId, targetUser.getId())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "User is already a member of this group");
+        }
+
+        GroupMember member = GroupMember.builder()
+                .group(group)
+                .user(targetUser)
+                .role("MEMBER")
+                .build();
+        groupMemberRepository.save(member);
+
+        return toResponse(group);
+    }
+
     public GroupResponse addMember(Long groupId, Long targetUserId, Long requestingUserId) {
         Group group = groupRepository.findById(groupId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Group not found"));

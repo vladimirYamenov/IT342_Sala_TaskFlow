@@ -54,7 +54,10 @@ export default function Groups({ user }) {
 
   const handleAddMember = async (e) => {
     e.preventDefault();
-    if (!memberEmail.trim() || !selected) return;
+    if (!memberEmail.trim() || !selected) {
+      setError('Please enter a valid email address.');
+      return;
+    }
     setError('');
     try {
       await groupApi.addMember(selected.id, memberEmail);
@@ -115,7 +118,8 @@ export default function Groups({ user }) {
             </div>
             <form className="add-member-form" onSubmit={handleAddMember}>
               <input
-                placeholder="User ID to add"
+                type="email"
+                placeholder="Enter member's email address"
                 value={memberEmail}
                 onChange={(e) => setMemberEmail(e.target.value)}
               />

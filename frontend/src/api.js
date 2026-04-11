@@ -57,7 +57,7 @@ export const groupApi = {
   list: () => request('/api/groups'),
   get: (id) => request(`/api/groups/${id}`),
   create: (data) => request('/api/groups', { method: 'POST', body: JSON.stringify(data) }),
-  addMember: (groupId, userId) => request(`/api/groups/${groupId}/members`, { method: 'POST', body: JSON.stringify({ userId }) }),
+  addMember: (groupId, email) => request(`/api/groups/${groupId}/members`, { method: 'POST', body: JSON.stringify({ email }) }),
   removeMember: (groupId, userId) => request(`/api/groups/${groupId}/members/${userId}`, { method: 'DELETE' }),
   getTasks: (groupId, params = {}) => {
     const query = new URLSearchParams(params).toString();

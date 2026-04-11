@@ -51,7 +51,7 @@ public class GroupController {
                                                    @RequestBody AddMemberRequest request,
                                                    Authentication authentication) {
         User user = (User) authentication.getPrincipal();
-        GroupResponse group = groupService.addMember(id, request.getUserId(), user.getId());
+        GroupResponse group = groupService.addMemberByEmail(id, request.getEmail(), user.getId());
         return ResponseEntity.ok(group);
     }
 

@@ -64,7 +64,7 @@ export default function Groups({ user, addToast }) {
   const handleAddMember = async (e) => {
     e.preventDefault();
     if (!memberInput.trim() || !selected) {
-      setError('Please enter a User ID.');
+      setError('Please enter a valid email address.');
       return;
     }
     setError('');
@@ -136,7 +136,8 @@ export default function Groups({ user, addToast }) {
             </div>
             <form className="add-member-form" onSubmit={handleAddMember}>
               <input
-                placeholder="Enter User ID to add"
+                type="email"
+                placeholder="Enter member's email address"
                 value={memberInput}
                 onChange={(e) => setMemberInput(e.target.value)}
               />
