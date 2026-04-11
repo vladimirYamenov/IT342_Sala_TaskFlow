@@ -1,9 +1,11 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { authApi } from '../api';
 
 export default function Login({ onAuth }) {
   const navigate = useNavigate();
+  const location = useLocation();
+  const successMessage = location.state?.message || '';
   const [form, setForm] = useState({ email: '', password: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -41,6 +43,7 @@ export default function Login({ onAuth }) {
           <p>Sign in to continue to TaskFlow</p>
         </div>
 
+        {successMessage && <p className="alert success">{successMessage}</p>}
         {error && <p className="alert error">{error}</p>}
 
         <form className="auth-form" onSubmit={handleSubmit}>

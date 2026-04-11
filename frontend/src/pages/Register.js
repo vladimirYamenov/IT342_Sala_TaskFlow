@@ -29,10 +29,8 @@ export default function Register({ onAuth }) {
     setLoading(true);
     setError('');
     try {
-      const data = await authApi.register(form);
-      localStorage.setItem('token', data.token);
-      onAuth(data);
-      navigate('/');
+      await authApi.register(form);
+      navigate('/login', { state: { message: 'Account created successfully! Please log in.' } });
     } catch (err) {
       setError(err.message || 'Registration failed.');
     } finally {
