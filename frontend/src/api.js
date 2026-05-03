@@ -52,6 +52,11 @@ export const taskApi = {
   delete: (id) => request(`/api/tasks/${id}`, { method: 'DELETE' }),
 };
 
+// Dashboard - Facade Pattern: single endpoint replaces multiple calls
+export const dashboardApi = {
+  get: () => request('/api/dashboard'),
+};
+
 // Groups
 export const groupApi = {
   list: () => request('/api/groups'),
