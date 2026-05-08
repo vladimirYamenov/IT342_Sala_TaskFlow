@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Builder
@@ -23,4 +24,15 @@ public class TaskResponse {
     private LocalDateTime updatedAt;
     private Long userId;
     private Long groupId;
+    private List<AssignedUserInfo> assignedUsers;
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class AssignedUserInfo {
+        private Long id;
+        private String email;
+        private String fullName;
+    }
 }

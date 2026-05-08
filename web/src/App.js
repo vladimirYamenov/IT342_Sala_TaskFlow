@@ -10,6 +10,7 @@ import Dashboard from './pages/Dashboard';
 import Tasks from './pages/Tasks';
 import Groups from './pages/Groups';
 import Files from './pages/Files';
+import Settings from './pages/Settings';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -68,9 +69,10 @@ function App() {
         {/* Protected routes */}
         <Route element={user ? <Layout user={user} onLogout={handleLogout} /> : <Navigate to="/login" />}>
           <Route index element={<Dashboard user={user} addToast={addToast} />} />
-          <Route path="tasks" element={<Tasks addToast={addToast} />} />
+          <Route path="tasks" element={<Tasks user={user} addToast={addToast} />} />
           <Route path="groups" element={<Groups user={user} addToast={addToast} />} />
           <Route path="files" element={<Files addToast={addToast} />} />
+          <Route path="settings" element={<Settings user={user} addToast={addToast} />} />
         </Route>
 
         <Route path="*" element={<Navigate to={user ? '/' : '/login'} />} />

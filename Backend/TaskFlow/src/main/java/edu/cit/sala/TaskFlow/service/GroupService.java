@@ -7,10 +7,12 @@ import edu.cit.sala.TaskFlow.entity.GroupMember;
 import edu.cit.sala.TaskFlow.entity.User;
 import edu.cit.sala.TaskFlow.repository.GroupMemberRepository;
 import edu.cit.sala.TaskFlow.repository.GroupRepository;
+import edu.cit.sala.TaskFlow.repository.TaskRepository;
 import edu.cit.sala.TaskFlow.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
@@ -22,6 +24,7 @@ public class GroupService {
     private final GroupRepository groupRepository;
     private final GroupMemberRepository groupMemberRepository;
     private final UserRepository userRepository;
+    private final TaskRepository taskRepository;
 
     public GroupResponse createGroup(GroupRequest request, User creator) {
         if (request.getName() == null || request.getName().isBlank()) {
@@ -140,6 +143,42 @@ public class GroupService {
 
     public boolean isGroupMember(Long groupId, Long userId) {
         return groupMemberRepository.existsByGroupIdAndUserId(groupId, userId);
+    }
+
+    public GroupResponse renameGroup(Long groupId, String newName, Long userId) {
+        if (newName == null || newName.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Group name is required");
+        }
+        Group group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Group not found"));
+
+        GroupMember requester = groupMemberRepository.findByGroupIdAndUserId(groupId, userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not a member of this group"));
+
+        if (!"ADMIN".equals(requester.getRole())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only admins can rename the group");
+        }
+
+        group.setName(newName);
+        groupRepository.save(group);
+        return toResponse(group);
+    }
+
+    @Transactional
+    public void deleteGroup(Long groupId, Long userId) {
+        groupRepository.findById(groupId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Group not found"));
+
+        GroupMember requester = groupMemberRepository.findByGroupIdAndUserId(groupId, userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not a member of this group"));
+
+        if (!"ADMIN".equals(requester.getRole())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only admins can delete the group");
+        }
+
+        taskRepository.deleteAll(taskRepository.findByGroupIdOrderByCreatedAtDesc(groupId));
+        groupMemberRepository.deleteByGroupId(groupId);
+        groupRepository.deleteById(groupId);
     }
 
     private GroupResponse toResponse(Group group) {

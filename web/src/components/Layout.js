@@ -1,10 +1,11 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 
 const navItems = [
-  { to: '/',       icon: '📊', label: 'Dashboard' },
-  { to: '/tasks',  icon: '✅', label: 'My Tasks' },
-  { to: '/groups', icon: '👥', label: 'Groups' },
-  { to: '/files',  icon: '📁', label: 'Files' },
+  { to: '/',          icon: '📊', label: 'Dashboard' },
+  { to: '/tasks',     icon: '✅', label: 'My Tasks' },
+  { to: '/groups',    icon: '👥', label: 'Groups' },
+  { to: '/files',     icon: '📁', label: 'Files' },
+  { to: '/settings',  icon: '⚙️', label: 'Settings' },
 ];
 
 export default function Layout({ user, onLogout }) {
@@ -35,22 +36,13 @@ export default function Layout({ user, onLogout }) {
               <span>{item.label}</span>
             </NavLink>
           ))}
+          <button className="nav-item btn-logout-nav" onClick={handleLogout} title="Log out">
+            <span className="nav-icon">🚪</span>
+            <span>Logout</span>
+          </button>
         </nav>
 
-        <div className="sidebar-footer">
-          <div className="sidebar-user">
-            <div className="user-avatar">
-              {(user?.fullName || 'U').charAt(0).toUpperCase()}
-            </div>
-            <div className="user-info">
-              <span className="user-name">{user?.fullName || 'User'}</span>
-              <span className="user-email">{user?.email || ''}</span>
-            </div>
-          </div>
-          <button className="btn-logout" onClick={handleLogout} title="Log out">
-            🚪
-          </button>
-        </div>
+
       </aside>
 
       <main className="main-content">

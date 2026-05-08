@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useState } from 'react';
-import { taskApi } from '../api';
+import { taskApi, groupApi } from '../api';
 
-const emptyTask = { title: '', description: '', priority: 'MEDIUM', status: 'TODO', dueDate: '' };
+const emptyTask = { title: '', description: '', priority: 'MEDIUM', status: 'TODO', dueDate: '', groupId: '', assignedUserIds: [] };
 
-export default function Tasks({ addToast }) {
+export default function Tasks({ user, addToast }) {
   const [tasks, setTasks] = useState([]);
+  const [groups, setGroups] = useState([]);
+  const [groupMembers, setGroupMembers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editing, setEditing] = useState(null);
@@ -32,6 +34,12 @@ export default function Tasks({ addToast }) {
 
   useEffect(() => { fetchTasks(); }, [fetchTasks]);
 
+  useEffect(() => {
+    groupApi.list()
+      .then((data) => setGroups(Array.isArray(data) ? data : []))
+      .catch(() => setGroups([]));
+  }, []);
+
   // Filter tasks by search query
   const filteredTasks = tasks.filter((task) => {
     if (!searchQuery.trim()) return true;
@@ -45,21 +53,62 @@ export default function Tasks({ addToast }) {
   const openCreate = () => {
     setEditing(null);
     setForm(emptyTask);
+    setGroupMembers([]);
     setError('');
     setShowModal(true);
   };
 
-  const openEdit = (task) => {
+  const openEdit = async (task) => {
     setEditing(task);
+    const groupId = task.groupId ? String(task.groupId) : '';
     setForm({
       title: task.title || '',
       description: task.description || '',
       priority: task.priority || 'MEDIUM',
       status: task.status || 'TODO',
       dueDate: task.dueDate ? task.dueDate.split('T')[0] : '',
+      groupId,
+      assignedUserIds: (task.assignedUsers || []).map((u) => u.id),
     });
+    if (groupId) {
+      try {
+        const group = await groupApi.get(groupId);
+        setGroupMembers(group.members || []);
+      } catch {
+        setGroupMembers([]);
+      }
+    } else {
+      setGroupMembers([]);
+    }
     setError('');
     setShowModal(true);
+  };
+
+  const handleGroupChange = async (e) => {
+    const groupId = e.target.value;
+    setForm((prev) => ({ ...prev, groupId, assignedUserIds: [] }));
+    if (groupId) {
+      try {
+        const group = await groupApi.get(groupId);
+        setGroupMembers(group.members || []);
+      } catch {
+        setGroupMembers([]);
+      }
+    } else {
+      setGroupMembers([]);
+    }
+  };
+
+  const toggleAssignedUser = (userId) => {
+    setForm((prev) => {
+      const ids = prev.assignedUserIds || [];
+      return {
+        ...prev,
+        assignedUserIds: ids.includes(userId)
+          ? ids.filter((id) => id !== userId)
+          : [...ids, userId],
+      };
+    });
   };
 
   const handleChange = (e) => {
@@ -86,12 +135,18 @@ export default function Tasks({ addToast }) {
     }
     setSaving(true);
     setError('');
+    const payload = {
+      ...form,
+      groupId: form.groupId ? Number(form.groupId) : null,
+      dueDate: form.dueDate || null,
+      assignedUserIds: form.assignedUserIds || [],
+    };
     try {
       if (editing) {
-        await taskApi.update(editing.id, form);
+        await taskApi.update(editing.id, payload);
         addToast(`Task "${form.title}" updated successfully!`, 'success');
       } else {
-        await taskApi.create(form);
+        await taskApi.create(payload);
         addToast(`Task "${form.title}" created successfully!`, 'success');
       }
       setShowModal(false);
@@ -117,7 +172,7 @@ export default function Tasks({ addToast }) {
 
   const handleQuickStatus = async (task, newStatus) => {
     try {
-      await taskApi.update(task.id, { ...task, status: newStatus, dueDate: task.dueDate ? task.dueDate.split('T')[0] : '' });
+      await taskApi.update(task.id, { ...task, status: newStatus, dueDate: task.dueDate ? task.dueDate.split('T')[0] : null });
       const label = newStatus.replace('_', ' ').toLowerCase();
       addToast(`Task marked as ${label}.`, 'success');
       fetchTasks();
@@ -245,6 +300,14 @@ export default function Tasks({ addToast }) {
                   </span>
                 )}
               </div>
+              {task.assignedUsers && task.assignedUsers.length > 0 && (
+                <div className="task-card-assignees">
+                  <span className="assignees-label">👤 Assigned: </span>
+                  {task.assignedUsers.map((u) => (
+                    <span key={u.id} className="assignee-tag">{u.fullName || u.email}</span>
+                  ))}
+                </div>
+              )}
               {task.status !== 'COMPLETED' && (
                 <div className="task-card-quick-actions">
                   {task.status !== 'IN_PROGRESS' && (
@@ -321,6 +384,39 @@ export default function Tasks({ addToast }) {
                 Due Date
                 <input type="date" name="dueDate" value={form.dueDate} onChange={handleChange} />
               </label>
+              <label>
+                Group (optional)
+                <select name="groupId" value={form.groupId} onChange={handleGroupChange}>
+                  <option value="">— Personal Task —</option>
+                  {groups.map((g) => (
+                    <option key={g.id} value={g.id}>{g.name}</option>
+                  ))}
+                </select>
+              </label>
+              {groupMembers.filter(m => m.userId !== user?.userId).length > 0 && (
+                <div className="assignees-section">
+                  <span className="form-label">Assign Members</span>
+                  <div className="assignees-avatar-picker">
+                    {groupMembers.filter(m => m.userId !== user?.userId).map((m) => {
+                      const isSelected = (form.assignedUserIds || []).includes(m.userId);
+                      const initials = (m.fullName || m.email || 'U').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+                      return (
+                        <button
+                          type="button"
+                          key={m.userId}
+                          className={`assignee-avatar-btn${isSelected ? ' selected' : ''}`}
+                          onClick={() => toggleAssignedUser(m.userId)}
+                          title={m.fullName || m.email}
+                        >
+                          <span className="assignee-avatar-circle">{initials}</span>
+                          <span className="assignee-avatar-name">{m.fullName || m.email}</span>
+                          {isSelected && <span className="assignee-avatar-check">✓</span>}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
               <div className="modal-actions">
                 <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>Cancel</button>
                 <button type="submit" className="btn btn-primary" disabled={saving}>

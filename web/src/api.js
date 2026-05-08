@@ -63,6 +63,8 @@ export const groupApi = {
     const query = new URLSearchParams(params).toString();
     return request(`/api/groups/${groupId}/tasks${query ? `?${query}` : ''}`);
   },
+  rename: (id, name) => request(`/api/groups/${id}`, { method: 'PUT', body: JSON.stringify({ name }) }),
+  delete: (id) => request(`/api/groups/${id}`, { method: 'DELETE' }),
 };
 
 // Files

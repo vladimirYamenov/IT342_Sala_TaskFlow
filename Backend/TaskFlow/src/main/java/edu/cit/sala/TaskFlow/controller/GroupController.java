@@ -73,4 +73,21 @@ public class GroupController {
         List<TaskResponse> tasks = taskService.getGroupTasks(id, user.getId(), status, priority);
         return ResponseEntity.ok(tasks);
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<GroupResponse> renameGroup(@PathVariable Long id,
+                                                     @RequestBody GroupRequest request,
+                                                     Authentication authentication) {
+        User user = (User) authentication.getPrincipal();
+        GroupResponse group = groupService.renameGroup(id, request.getName(), user.getId());
+        return ResponseEntity.ok(group);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteGroup(@PathVariable Long id,
+                                            Authentication authentication) {
+        User user = (User) authentication.getPrincipal();
+        groupService.deleteGroup(id, user.getId());
+        return ResponseEntity.noContent().build();
+    }
 }
