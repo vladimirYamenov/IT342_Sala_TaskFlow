@@ -1,7 +1,7 @@
 # TaskFlow – Full Regression Test Plan
 **Version:** 1.0  
 **Branch:** `refactor/vertical-slice-architecture`  
-**Date:** 2025  
+**Date:** 2026  
 **Prepared by:** Kirby Sala
 
 ---
@@ -72,9 +72,9 @@
 
 | TC-ID  | Test Case Name              | Precondition          | Steps                                       | Expected Result                         | Type        |
 |--------|-----------------------------|-----------------------|---------------------------------------------|-----------------------------------------|-------------|
-| TC-17  | Upload file                 | Authenticated user    | POST /api/files/upload (multipart)          | 200 OK, file metadata returned          | Integration |
+| TC-17  | Upload file                 | Authenticated user    | POST /api/files (multipart)                 | 201 Created, file metadata returned     | Integration |
 | TC-18  | List uploaded files         | Files exist           | GET /api/files                              | 200 OK, list of file metadata           | Integration |
-| TC-19  | Delete file                 | File exists           | DELETE /api/files/{id}                      | 200 OK, file removed                    | Integration |
+| TC-19  | Delete file                 | File exists           | DELETE /api/files/{id}                      | 204 No Content, file removed            | Integration |
 
 ### 4.5 Security (F-05)
 
