@@ -8,8 +8,8 @@
 
 ## 1. Objectives
 - Verify that the vertical slice architecture refactoring did not break any existing functionality.
-- Validate all major features across Backend (Spring Boot), Web (React), and Mobile (Android/Kotlin).
-- Provide evidence of passing automated tests and manual smoke-tests.
+- Validate all major features across Backend (Spring Boot) and Web (React).
+- Provide evidence of passing automated tests.
 
 ---
 
@@ -19,7 +19,6 @@
 |----------|----------------------|-------------------------|
 | Backend  | Spring Boot 3.3 / Java 17 | Unit + Integration (JUnit 5, MockMvc) |
 | Web      | React 18             | Component tests (React Testing Library) |
-| Mobile   | Android / Kotlin     | Manual smoke test       |
 
 ---
 
@@ -37,7 +36,7 @@
 
 ## 4. Test Cases
 
-> **Automation Note:** All JUnit 5 backend tests (TC-00 to TC-22) and React Testing Library web tests (TC-W01 to TC-W33) are **automated**. Mobile tests are **manual** smoke tests.
+> **Automation Note:** All JUnit 5 backend tests (TC-00 to TC-22) and React Testing Library web tests (TC-W01 to TC-W33) are **automated**.
 
 ### 4.0 Application Sanity Check
 
@@ -141,7 +140,6 @@
 | Test DB           | H2 In-Memory (test scope)            |
 | Test Framework    | JUnit 5, Spring Boot Test, MockMvc   |
 | Web               | React 18, React Testing Library      |
-| Mobile            | Android Studio (manual smoke)        |
 
 ---
 
@@ -164,5 +162,4 @@
 | 2c    | Run Dashboard tests only            | `npm test -- --watchAll=false --testPathPattern=Dashboard`                                | Dev   |
 | 2d    | Run Tasks tests only                | `npm test -- --watchAll=false --testPathPattern=Tasks`                                    | Dev   |
 | 2e    | Run Groups tests only               | `npm test -- --watchAll=false --testPathPattern=Groups`                                   | Dev   |
-| 3     | Manual Android smoke test           | Launch app on emulator/device; verify login, tasks, and groups features work end-to-end  | Dev   |
-| 4     | Document results                    | Update `FullRegressionReport_TaskFlow.md` with pass/fail for each TC-ID                  | Dev   |
+| 3     | Document results                    | Update `FullRegressionReport_TaskFlow.md` with pass/fail for each TC-ID                  | Dev   |

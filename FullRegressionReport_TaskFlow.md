@@ -3,13 +3,13 @@
 **Branch:** `refactor/vertical-slice-architecture`  
 **Execution Date:** May 9, 2026  
 **Prepared by:** Kirby Sala  
-**Project:** IT342 – TaskFlow (Spring Boot + React + Android)
+**Project:** IT342 – TaskFlow (Spring Boot + React)
 
 ---
 
 ## 1. Executive Summary
 
-The vertical slice architecture refactoring of the TaskFlow project was completed across all three layers: **Backend (Spring Boot)**, **Web Frontend (React)**, and **Mobile (Android/Kotlin)**. A full regression test suite of **56 automated tests** was executed post-refactoring — 23 JUnit 5 backend integration tests and 33 React (Jest + Testing Library) frontend unit/component tests.
+The vertical slice architecture refactoring of the TaskFlow project was completed across two layers: **Backend (Spring Boot)** and **Web Frontend (React)**. A full regression test suite of **56 automated tests** was executed post-refactoring — 23 JUnit 5 backend integration tests and 33 React (Jest + Testing Library) frontend unit/component tests.
 
 | Metric                  | Backend (JUnit 5) | Web Frontend (Jest) | Total            |
 |-------------------------|-------------------|---------------------|------------------|
@@ -80,28 +80,7 @@ web/src/
 **Files moved:** 10 JS files  
 **Import paths updated:** App.js and all page files
 
-### 2.3 Mobile (Android/Kotlin)
-
-**Before:**
-```
-com.example.mobile/
-├── API/           (ApiClient.kt, AuthApiService.kt)
-├── model/         (AuthResponse.kt, LoginRequest.kt, RegisterRequest.kt)
-└── UserInterface/ (LoginActivity.kt, RegisterActivity.kt)
-```
-
-**After:**
-```
-com.example.mobile/
-├── feature/
-│   └── auth/   (LoginActivity.kt, RegisterActivity.kt, AuthApiService.kt, AuthResponse.kt, LoginRequest.kt, RegisterRequest.kt)
-└── shared/
-    └── api/    (ApiClient.kt)
-```
-**Files moved:** 7 Kotlin files  
-**AndroidManifest.xml:** Updated activity class references
-
-### 2.4 Test Plan Documentation
+### 2.3 Test Plan Documentation
 
 The complete Software Test Plan is documented in [`TestPlan_TaskFlow.md`](./TestPlan_TaskFlow.md). It covers all 5 implemented features with 55 defined test cases (+ 1 sanity check = 56 total) across backend and web layers.
 
@@ -123,7 +102,6 @@ The complete Software Test Plan is documented in [`TestPlan_TaskFlow.md`](./Test
 |---------|------------------------------------------------------------------|
 | Backend | `cd Backend/TaskFlow && .\mvnw.cmd test`                         |
 | Web     | `cd web && npm test -- --watchAll=false`                         |
-| Mobile  | Manual: launch app on emulator, verify login, tasks, groups      |
 
 ---
 
@@ -398,6 +376,6 @@ bf8aaa9  (origin/main) Changes: Edited groups & task including adding new settin
 
 ## 6. Conclusion
 
-The vertical slice architecture refactoring was completed successfully across all three layers of the TaskFlow application. The full regression suite of **56 automated tests** (23 JUnit 5 backend + 33 React frontend) confirms that no functionality was broken during the restructuring. The codebase now follows a feature-cohesive organization where each feature's controllers, services, entities, repositories, DTOs, and UI components are co-located, improving maintainability and scalability.
+The vertical slice architecture refactoring was completed successfully across both layers of the TaskFlow application. The full regression suite of **56 automated tests** (23 JUnit 5 backend + 33 React frontend) confirms that no functionality was broken during the restructuring. The codebase now follows a feature-cohesive organization where each feature's controllers, services, entities, repositories, DTOs, and UI components are co-located, improving maintainability and scalability.
 
 **Final Status: PASS ✅**
