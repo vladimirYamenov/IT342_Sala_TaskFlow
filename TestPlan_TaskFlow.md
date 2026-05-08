@@ -37,7 +37,13 @@
 
 ## 4. Test Cases
 
-> **Automation Note:** All JUnit 5 backend tests (TC-01 to TC-22) and React Testing Library web tests (TC-W01 to TC-W33) are **automated**. Mobile tests are **manual** smoke tests.
+> **Automation Note:** All JUnit 5 backend tests (TC-00 to TC-22) and React Testing Library web tests (TC-W01 to TC-W33) are **automated**. Mobile tests are **manual** smoke tests.
+
+### 4.0 Application Sanity Check
+
+| TC-ID  | Test Case Name              | Precondition      | Steps                                           | Expected Result                         | Type                    |
+|--------|-----------------------------|-------------------|-------------------------------------------------|-----------------------------------------|-------------------------|
+| TC-00  | Spring context loads        | Application built | Run `.\mvnw.cmd test` (context initialization)  | Spring ApplicationContext loads without errors | Automated (Integration) |
 
 ### 4.1 Authentication (F-01)
 
