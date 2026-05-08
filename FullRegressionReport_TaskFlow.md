@@ -9,16 +9,16 @@
 
 ## 1. Executive Summary
 
-The vertical slice architecture refactoring of the TaskFlow project was completed across all three layers: **Backend (Spring Boot)**, **Web Frontend (React)**, and **Mobile (Android/Kotlin)**. A full regression test suite of **50 automated tests** was executed post-refactoring — 17 JUnit 5 backend integration tests and 33 React (Jest + Testing Library) frontend unit/component tests.
+The vertical slice architecture refactoring of the TaskFlow project was completed across all three layers: **Backend (Spring Boot)**, **Web Frontend (React)**, and **Mobile (Android/Kotlin)**. A full regression test suite of **56 automated tests** was executed post-refactoring — 23 JUnit 5 backend integration tests and 33 React (Jest + Testing Library) frontend unit/component tests.
 
 | Metric                  | Backend (JUnit 5) | Web Frontend (Jest) | Total            |
 |-------------------------|-------------------|---------------------|------------------|
-| Total Tests Run         | 17                | 33                  | **50**           |
-| Tests Passed            | 17                | 33                  | **50**           |
+| Total Tests Run         | 23                | 33                  | **56**           |
+| Tests Passed            | 23                | 33                  | **56**           |
 | Tests Failed            | 0                 | 0                   | **0**            |
 | Tests Skipped           | 0                 | 0                   | **0**            |
 | Build / Test Result     | BUILD SUCCESS     | PASS (5 suites)     | ✅ **ALL PASS**  |
-| Total Execution Time    | ~14 s             | ~3.2 s              | ~17 s            |
+| Total Execution Time    | ~15.6 s           | ~3.2 s              | ~19 s            |
 
 ---
 
@@ -138,19 +138,25 @@ com.example.mobile/
 | TC-14  | Get user's groups returns 200 with list               | ✅ PASS | 200           | 200         |
 | TC-15  | Add member to group by email returns 200              | ✅ PASS | 200           | 200         |
 | TC-16  | Delete group by owner returns 204                     | ✅ PASS | 204           | 204         |
+| TC-17  | Upload file returns 201 with file metadata            | ✅ PASS | 201           | 201         |
+| TC-18  | List uploaded files returns 200 with entries          | ✅ PASS | 200           | 200         |
+| TC-19  | Delete file returns 204 No Content                    | ✅ PASS | 204           | 204         |
+| TC-20  | Valid JWT token grants access to protected endpoint   | ✅ PASS | 200           | 200         |
+| TC-21  | Expired JWT token is rejected with 403 Forbidden      | ✅ PASS | 403           | 403         |
+| TC-22  | Malformed JWT token is rejected with 403 Forbidden    | ✅ PASS | 403           | 403         |
 
 ### 3.3 Maven Test Output (abbreviated)
 
 ```
 [INFO] Running edu.cit.sala.TaskFlow.TaskFlowApplicationTests
-[INFO] Tests run: 17, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 11.06 s
+[INFO] Tests run: 23, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 12.34 s
 [INFO]
 [INFO] Results:
 [INFO]
-[INFO] Tests run: 17, Failures: 0, Errors: 0, Skipped: 0
+[INFO] Tests run: 23, Failures: 0, Errors: 0, Skipped: 0
 [INFO]
 [INFO] BUILD SUCCESS
-[INFO] Total time:  14.341 s
+[INFO] Total time:  15.571 s
 ```
 
 ---
@@ -234,12 +240,14 @@ Time:        3.16 s
 
 ### 4.2 Regression Impact
 
-**No functional regressions detected.** All 50 test cases pass after the refactoring:
+**No functional regressions detected.** All 56 test cases pass after the refactoring:
 
 - Authentication flows (register, login, JWT) work correctly across backend and web
 - Task CRUD operations maintain access control (backend) and client-side filtering (web)
 - Group management with member addition works correctly
 - Security config properly rejects unauthenticated requests
+- File upload, listing, and deletion work correctly (TC-17 to TC-19)
+- JWT validation enforced: valid token grants access, expired token rejected, malformed token rejected (TC-20 to TC-22)
 - Cross-feature dependencies (Task→User, GroupMember→User, FileEntity→User/Task) correctly resolved
 - React components render correctly after import path restructuring
 - All form validations in Login, Register, Tasks, and Groups work as expected
@@ -260,6 +268,6 @@ bf8aaa9  (origin/main) Changes: Edited groups & task including adding new settin
 
 ## 6. Conclusion
 
-The vertical slice architecture refactoring was completed successfully across all three layers of the TaskFlow application. The full regression suite of **50 automated tests** (17 JUnit 5 backend + 33 React frontend) confirms that no functionality was broken during the restructuring. The codebase now follows a feature-cohesive organization where each feature's controllers, services, entities, repositories, DTOs, and UI components are co-located, improving maintainability and scalability.
+The vertical slice architecture refactoring was completed successfully across all three layers of the TaskFlow application. The full regression suite of **56 automated tests** (23 JUnit 5 backend + 33 React frontend) confirms that no functionality was broken during the restructuring. The codebase now follows a feature-cohesive organization where each feature's controllers, services, entities, repositories, DTOs, and UI components are co-located, improving maintainability and scalability.
 
 **Final Status: PASS ✅**

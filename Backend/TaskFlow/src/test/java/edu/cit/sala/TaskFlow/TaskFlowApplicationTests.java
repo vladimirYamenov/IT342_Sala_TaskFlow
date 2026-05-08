@@ -4,20 +4,29 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.cit.sala.TaskFlow.feature.auth.LoginRequest;
 import edu.cit.sala.TaskFlow.feature.auth.RegisterRequest;
 import edu.cit.sala.TaskFlow.feature.auth.UserRepository;
+import edu.cit.sala.TaskFlow.feature.file.FileRepository;
 import edu.cit.sala.TaskFlow.feature.task.TaskRepository;
 import edu.cit.sala.TaskFlow.feature.task.TaskRequest;
 import edu.cit.sala.TaskFlow.feature.group.GroupRepository;
 import edu.cit.sala.TaskFlow.feature.group.GroupRequest;
 import edu.cit.sala.TaskFlow.feature.group.AddMemberRequest;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+
+import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
+import java.util.Date;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -28,7 +37,9 @@ import static org.hamcrest.Matchers.*;
  *
  * Covers: Authentication (TC-01 to TC-07),
  *         Task Management (TC-08 to TC-12),
- *         Group Management (TC-13 to TC-16)
+ *         Group Management (TC-13 to TC-16),
+ *         File Management (TC-17 to TC-19),
+ *         Security / JWT (TC-20 to TC-22)
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @AutoConfigureMockMvc
@@ -50,6 +61,12 @@ class TaskFlowApplicationTests {
     @Autowired
     GroupRepository groupRepository;
 
+    @Autowired
+    FileRepository fileRepository;
+
+    @Value("${jwt.secret}")
+    String jwtSecret;
+
     // Prevent actual email sending during tests
     @MockBean
     JavaMailSender javaMailSender;
@@ -59,6 +76,7 @@ class TaskFlowApplicationTests {
     static String secondUserToken;
     static Long createdTaskId;
     static Long createdGroupId;
+    static Long uploadedFileId;
 
     // =========================================================================
     // Context loads sanity check
@@ -338,6 +356,91 @@ class TaskFlowApplicationTests {
         mockMvc.perform(delete("/api/groups/" + createdGroupId)
                 .header("Authorization", "Bearer " + jwtToken))
                 .andExpect(status().isNoContent());
+    }
+
+    // =========================================================================
+    // File Management Tests (TC-17 to TC-19)
+    // =========================================================================
+
+    @Test
+    @Order(17)
+    @DisplayName("TC-17: Upload file returns 201 with file metadata")
+    void tc17_uploadFile() throws Exception {
+        MockMultipartFile file = new MockMultipartFile(
+                "file",
+                "test-image.png",
+                "image/png",
+                "fake-png-content".getBytes()
+        );
+
+        MvcResult result = mockMvc.perform(multipart("/api/files")
+                .file(file)
+                .header("Authorization", "Bearer " + jwtToken))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.fileName", is("test-image.png")))
+                .andExpect(jsonPath("$.fileType", is("image/png")))
+                .andReturn();
+
+        uploadedFileId = objectMapper.readTree(result.getResponse().getContentAsString()).get("id").asLong();
+    }
+
+    @Test
+    @Order(18)
+    @DisplayName("TC-18: List uploaded files returns 200 with at least one entry")
+    void tc18_listFiles() throws Exception {
+        mockMvc.perform(get("/api/files")
+                .header("Authorization", "Bearer " + jwtToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(greaterThanOrEqualTo(1))));
+    }
+
+    @Test
+    @Order(19)
+    @DisplayName("TC-19: Delete file returns 204 No Content")
+    void tc19_deleteFile() throws Exception {
+        mockMvc.perform(delete("/api/files/" + uploadedFileId)
+                .header("Authorization", "Bearer " + jwtToken))
+                .andExpect(status().isNoContent());
+    }
+
+    // =========================================================================
+    // Security / JWT Tests (TC-20 to TC-22)
+    // =========================================================================
+
+    @Test
+    @Order(20)
+    @DisplayName("TC-20: Valid JWT token grants access to protected endpoint")
+    void tc20_validJwtGrantsAccess() throws Exception {
+        mockMvc.perform(get("/api/tasks")
+                .header("Authorization", "Bearer " + jwtToken))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @Order(21)
+    @DisplayName("TC-21: Expired JWT token is rejected with 403 Forbidden")
+    void tc21_expiredJwtRejected() throws Exception {
+        SecretKey secretKey = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
+        String expiredToken = Jwts.builder()
+                .subject("expired@example.com")
+                .claim("userId", -1L)
+                .issuedAt(new Date(System.currentTimeMillis() - 7200000))  // 2 hours ago
+                .expiration(new Date(System.currentTimeMillis() - 3600000)) // expired 1 hour ago
+                .signWith(secretKey)
+                .compact();
+
+        mockMvc.perform(get("/api/tasks")
+                .header("Authorization", "Bearer " + expiredToken))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @Order(22)
+    @DisplayName("TC-22: Malformed JWT token is rejected with 403 Forbidden")
+    void tc22_malformedJwtRejected() throws Exception {
+        mockMvc.perform(get("/api/tasks")
+                .header("Authorization", "Bearer this.is.not.a.valid.jwt"))
+                .andExpect(status().isForbidden());
     }
 }
 
