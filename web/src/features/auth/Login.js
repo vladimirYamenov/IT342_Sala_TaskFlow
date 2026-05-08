@@ -1,10 +1,12 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { authApi } from '../api';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { authApi } from '../../shared/api';
 
-export default function Register({ onAuth, addToast }) {
+export default function Login({ onAuth, addToast }) {
   const navigate = useNavigate();
-  const [form, setForm] = useState({ fullName: '', email: '', password: '', confirmPassword: '' });
+  const location = useLocation();
+  const successMessage = location.state?.message || '';
+  const [form, setForm] = useState({ email: '', password: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -14,14 +16,9 @@ export default function Register({ onAuth, addToast }) {
   };
 
   const validate = () => {
-    if (!form.fullName.trim()) return 'Full name is required.';
-    if (form.fullName.trim().length < 2) return 'Full name must be at least 2 characters.';
     if (!form.email.trim()) return 'Email is required.';
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) return 'Please enter a valid email address.';
     if (!form.password) return 'Password is required.';
-    if (form.password.length < 8) return 'Password must be at least 8 characters.';
-    if (!form.confirmPassword) return 'Please confirm your password.';
-    if (form.password !== form.confirmPassword) return 'Passwords do not match.';
     return null;
   };
 
@@ -35,11 +32,13 @@ export default function Register({ onAuth, addToast }) {
     setLoading(true);
     setError('');
     try {
-      await authApi.register(form);
-      addToast('Account created successfully!', 'success');
-      navigate('/login', { state: { message: 'Account created successfully! Please log in.' } });
+      const data = await authApi.login(form);
+      localStorage.setItem('token', data.token);
+      onAuth(data);
+      addToast('Welcome back!', 'success');
+      navigate('/');
     } catch (err) {
-      setError(err.message || 'Registration failed. Please try again.');
+      setError(err.message || 'Login failed. Please check your credentials.');
     } finally {
       setLoading(false);
     }
@@ -50,24 +49,14 @@ export default function Register({ onAuth, addToast }) {
       <section className="auth-card fade-in">
         <div className="auth-header">
           <span className="brand-icon">⚡</span>
-          <h1>Create Account</h1>
-          <p>Register to start collaborating on TaskFlow</p>
+          <h1>Welcome Back</h1>
+          <p>Sign in to continue to TaskFlow</p>
         </div>
 
+        {successMessage && <p className="alert success">{successMessage}</p>}
         {error && <p className="alert error">{error}</p>}
 
         <form className="auth-form" onSubmit={handleSubmit} noValidate>
-          <label>
-            Full Name
-            <input
-              type="text"
-              name="fullName"
-              value={form.fullName}
-              onChange={handleChange}
-              placeholder="Juan Dela Cruz"
-              autoComplete="name"
-            />
-          </label>
           <label>
             Email
             <input
@@ -86,28 +75,17 @@ export default function Register({ onAuth, addToast }) {
               name="password"
               value={form.password}
               onChange={handleChange}
-              placeholder="At least 8 characters"
-              autoComplete="new-password"
-            />
-          </label>
-          <label>
-            Confirm Password
-            <input
-              type="password"
-              name="confirmPassword"
-              value={form.confirmPassword}
-              onChange={handleChange}
-              placeholder="Re-enter password"
-              autoComplete="new-password"
+              placeholder="Enter your password"
+              autoComplete="current-password"
             />
           </label>
           <button className="btn btn-primary" type="submit" disabled={loading}>
-            {loading ? 'Creating account...' : 'Create Account'}
+            {loading ? 'Signing in...' : 'Sign In'}
           </button>
         </form>
 
         <p className="auth-switch">
-          Already have an account? <Link to="/login">Sign in</Link>
+          Don't have an account? <Link to="/register">Create one</Link>
         </p>
       </section>
     </main>

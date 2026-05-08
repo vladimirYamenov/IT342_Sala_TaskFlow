@@ -1,4 +1,4 @@
-package com.example.mobile.UserInterface
+package com.example.mobile.feature.auth
 
 import android.content.Intent
 import android.os.Bundle
@@ -9,9 +9,9 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.example.mobile.API.ApiClient
+import com.example.mobile.shared.api.ApiClient
 import com.example.mobile.R
-import com.example.mobile.model.RegisterRequest
+import com.example.mobile.feature.auth.RegisterRequest
 import kotlinx.coroutines.launch
 
 class RegisterActivity : AppCompatActivity() {

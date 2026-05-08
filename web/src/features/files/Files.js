@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { fileApi } from '../api';
+import { fileApi } from '../../shared/api';
 
 export default function Files({ addToast }) {
   const [files, setFiles] = useState([]);

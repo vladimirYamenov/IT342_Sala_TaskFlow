@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { taskApi, groupApi } from '../api';
+import { taskApi, groupApi } from '../../shared/api';
 
 export default function Dashboard({ user }) {
   const [tasks, setTasks] = useState([]);

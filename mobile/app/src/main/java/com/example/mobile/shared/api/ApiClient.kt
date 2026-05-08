@@ -1,6 +1,6 @@
-package com.example.mobile.API
+package com.example.mobile.shared.api
 
-import com.example.mobile.model.AuthResponse
+import com.example.mobile.feature.auth.AuthResponse
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit

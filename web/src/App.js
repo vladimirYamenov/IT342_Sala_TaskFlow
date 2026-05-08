@@ -1,16 +1,16 @@
 import './App.css';
 import { useEffect, useState, useCallback } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { authApi } from './api';
-import Layout from './components/Layout';
-import Toast from './components/Toast';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import Dashboard from './pages/Dashboard';
-import Tasks from './pages/Tasks';
-import Groups from './pages/Groups';
-import Files from './pages/Files';
-import Settings from './pages/Settings';
+import { authApi } from './shared/api';
+import Layout from './shared/components/Layout';
+import Toast from './shared/components/Toast';
+import Login from './features/auth/Login';
+import Register from './features/auth/Register';
+import Dashboard from './features/dashboard/Dashboard';
+import Tasks from './features/tasks/Tasks';
+import Groups from './features/groups/Groups';
+import Files from './features/files/Files';
+import Settings from './features/settings/Settings';
 
 function App() {
   const [user, setUser] = useState(null);

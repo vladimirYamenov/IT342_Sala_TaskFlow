@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { groupApi, taskApi } from '../api';
+import { groupApi, taskApi } from '../../shared/api';
 
 const emptyGroupTask = { title: '', description: '', priority: 'MEDIUM', status: 'TODO', dueDate: '', assignedUserIds: [] };
 

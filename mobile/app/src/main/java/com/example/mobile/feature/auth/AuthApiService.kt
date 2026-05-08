@@ -1,11 +1,11 @@
-package com.example.mobile.API
+package com.example.mobile.feature.auth
 
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.POST
-import com.example.mobile.model.RegisterRequest
-import com.example.mobile.model.AuthResponse
-import com.example.mobile.model.LoginRequest
+import com.example.mobile.feature.auth.RegisterRequest
+import com.example.mobile.feature.auth.AuthResponse
+import com.example.mobile.feature.auth.LoginRequest
 import okhttp3.ResponseBody
 
 
