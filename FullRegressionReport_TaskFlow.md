@@ -178,38 +178,38 @@ com.example.mobile/
 | TC-ID  | Test Suite          | Test Name                                                          | Status  |
 |--------|---------------------|--------------------------------------------------------------------|---------|
 | TC-W01 | Login               | renders email and password fields                                  | ✅ PASS |
-| TC-W01 | Login               | renders Sign In button                                             | ✅ PASS |
-| TC-W02 | Login               | shows error when email is empty                                    | ✅ PASS |
-| TC-W03 | Login               | shows error when email format is invalid                           | ✅ PASS |
-| TC-W04 | Login               | shows error when password is missing                               | ✅ PASS |
-| TC-W04 | Login               | calls authApi.login and navigates on success                       | ✅ PASS |
-| TC-W05 | Login               | shows API error on wrong credentials                               | ✅ PASS |
-| TC-W06 | Register            | renders "Create Account" heading                                   | ✅ PASS |
-| TC-W06 | Register            | renders sign-up submit button                                      | ✅ PASS |
-| TC-W07 | Register            | shows error when full name is empty                                | ✅ PASS |
-| TC-W07 | Register            | shows error when full name is too short                            | ✅ PASS |
-| TC-W07 | Register            | shows error when email is empty                                    | ✅ PASS |
-| TC-W08 | Register            | shows error when passwords do not match                            | ✅ PASS |
-| TC-W09 | Register            | shows error when password is less than 8 characters               | ✅ PASS |
-| TC-W10 | Register            | calls authApi.register and navigates to login on success           | ✅ PASS |
-| TC-W10 | Register            | shows API error message on registration failure                    | ✅ PASS |
-| TC-W11 | Dashboard           | shows loading indicator while data is fetching                     | ✅ PASS |
-| TC-W12 | Dashboard           | displays correct task counts after data loads                      | ✅ PASS |
-| TC-W12 | Dashboard           | displays group names after data loads                              | ✅ PASS |
-| TC-W13 | Dashboard           | shows welcome message with user fullName                           | ✅ PASS |
-| TC-W13 | Dashboard           | shows fallback 'User' when fullName is missing                     | ✅ PASS |
-| TC-W14 | Tasks               | shows empty state message when no tasks exist                      | ✅ PASS |
-| TC-W15 | Tasks               | renders New Task button                                            | ✅ PASS |
-| TC-W16 | Tasks               | opens create task modal when New Task button is clicked            | ✅ PASS |
-| TC-W17 | Tasks               | filters tasks by search query                                      | ✅ PASS |
-| TC-W18 | Tasks               | calls taskApi.create and refreshes list on save                    | ✅ PASS |
-| TC-W19 | Groups              | shows empty state message when no groups exist                     | ✅ PASS |
-| TC-W19 | Groups              | renders group names from API                                       | ✅ PASS |
-| TC-W20 | Groups              | shows loading indicator while groups are fetching                  | ✅ PASS |
-| TC-W21 | Groups              | shows error when group name is empty                               | ✅ PASS |
-| TC-W21 | Groups              | shows error when group name is too short                           | ✅ PASS |
-| TC-W21 | Groups              | shows error when group name is too short (validation)              | ✅ PASS |
-| TC-W22 | Groups              | calls groupApi.create with correct name and refreshes list         | ✅ PASS |
+| TC-W02 | Login               | renders Sign In button                                             | ✅ PASS |
+| TC-W03 | Login               | shows error when email is empty                                    | ✅ PASS |
+| TC-W04 | Login               | shows error when email format is invalid                           | ✅ PASS |
+| TC-W05 | Login               | shows error when password is missing                               | ✅ PASS |
+| TC-W06 | Login               | calls authApi.login and navigates on success                       | ✅ PASS |
+| TC-W07 | Login               | shows API error on wrong credentials                               | ✅ PASS |
+| TC-W08 | Register            | renders "Create Account" heading                                   | ✅ PASS |
+| TC-W09 | Register            | renders sign-up submit button                                      | ✅ PASS |
+| TC-W10 | Register            | shows error when full name is empty                                | ✅ PASS |
+| TC-W11 | Register            | shows error when full name is too short                            | ✅ PASS |
+| TC-W12 | Register            | shows error when email is empty                                    | ✅ PASS |
+| TC-W13 | Register            | shows error when passwords do not match                            | ✅ PASS |
+| TC-W14 | Register            | shows error when password is less than 8 characters               | ✅ PASS |
+| TC-W15 | Register            | calls authApi.register and navigates to login on success           | ✅ PASS |
+| TC-W16 | Register            | shows API error message on registration failure                    | ✅ PASS |
+| TC-W17 | Dashboard           | shows loading indicator while data is fetching                     | ✅ PASS |
+| TC-W18 | Dashboard           | displays correct task counts after data loads                      | ✅ PASS |
+| TC-W19 | Dashboard           | displays group names after data loads                              | ✅ PASS |
+| TC-W20 | Dashboard           | shows welcome message with user fullName                           | ✅ PASS |
+| TC-W21 | Dashboard           | shows fallback 'User' when fullName is missing                     | ✅ PASS |
+| TC-W22 | Tasks               | shows empty state message when no tasks exist                      | ✅ PASS |
+| TC-W23 | Tasks               | renders New Task button                                            | ✅ PASS |
+| TC-W24 | Tasks               | opens create task modal when New Task button is clicked            | ✅ PASS |
+| TC-W25 | Tasks               | filters tasks by search query                                      | ✅ PASS |
+| TC-W26 | Tasks               | calls taskApi.create and refreshes list on save                    | ✅ PASS |
+| TC-W27 | Groups              | shows empty state message when no groups exist                     | ✅ PASS |
+| TC-W28 | Groups              | renders group names from API                                       | ✅ PASS |
+| TC-W29 | Groups              | shows loading indicator while groups are fetching                  | ✅ PASS |
+| TC-W30 | Groups              | shows error when group name is empty                               | ✅ PASS |
+| TC-W31 | Groups              | shows error when group name is too short                           | ✅ PASS |
+| TC-W32 | Groups              | shows error when group name is too short (min 2 chars)             | ✅ PASS |
+| TC-W33 | Groups              | calls groupApi.create with correct name and refreshes list         | ✅ PASS |
 
 ### 3.6 Jest Test Output (abbreviated)
 
@@ -257,9 +257,12 @@ Time:        3.16 s
 ## 5. Git History
 
 ```
+4f10d38  test: add TC-17 to TC-22 (file management + JWT security tests, 23/23 passing)
+5d2163b  docs: update regression report to include 33 web frontend tests (total 50)
 73d8c1f  test: web frontend regression suite (33 tests, all passing)
+5e92431  docs: add test plan and full regression report
 ff2d562  test: full regression suite (17 tests, all passing)
-1791b3c  refactor: vertical slice architecture for web frontend and mobile  
+1791b3c  refactor: vertical slice architecture for web frontend and mobile
 a6c54d7  refactor: vertical slice architecture for backend
 bf8aaa9  (origin/main) Changes: Edited groups & task including adding new settings page
 ```
