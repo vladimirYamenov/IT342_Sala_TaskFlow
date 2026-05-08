@@ -1,7 +1,7 @@
 # TaskFlow – Full Regression Test Report
 **Version:** 1.0  
 **Branch:** `refactor/vertical-slice-architecture`  
-**Execution Date:** May 2025  
+**Execution Date:** May 9, 2026  
 **Prepared by:** Kirby Sala  
 **Project:** IT342 – TaskFlow (Spring Boot + React + Android)
 
@@ -100,6 +100,30 @@ com.example.mobile/
 ```
 **Files moved:** 7 Kotlin files  
 **AndroidManifest.xml:** Updated activity class references
+
+### 2.4 Test Plan Documentation
+
+The complete Software Test Plan is documented in [`TestPlan_TaskFlow.md`](./TestPlan_TaskFlow.md). It covers all 5 implemented features with 55 defined test cases (+ 1 sanity check = 56 total) across backend and web layers.
+
+#### Test Coverage by Feature
+
+| Feature ID | Feature Name      | Backend Tests             | Web Tests               | Subtotal |
+|------------|-------------------|---------------------------|-------------------------|----------|
+| F-01       | Authentication    | TC-01 – TC-07 (7 tests)  | TC-W01 – TC-W16 (16 tests) | 23    |
+| F-02       | Task Management   | TC-08 – TC-12 (5 tests)  | TC-W22 – TC-W26 (5 tests)  | 10    |
+| F-03       | Group Management  | TC-13 – TC-16 (4 tests)  | TC-W27 – TC-W33 (7 tests)  | 11    |
+| F-04       | File Management   | TC-17 – TC-19 (3 tests)  | —                           | 3     |
+| F-05       | Security & JWT    | TC-20 – TC-22 (3 tests)  | —                           | 3     |
+| —          | Dashboard (Web)   | TC-00 (context load)     | TC-W17 – TC-W21 (5 tests)  | 6     |
+| **Total**  |                   | **23 tests**              | **33 tests**                | **56**  |
+
+#### Test Execution Commands
+
+| Layer   | Command                                                          |
+|---------|------------------------------------------------------------------|
+| Backend | `cd Backend/TaskFlow && .\mvnw.cmd test`                         |
+| Web     | `cd web && npm test -- --watchAll=false`                         |
+| Mobile  | Manual: launch app on emulator, verify login, tasks, groups      |
 
 ---
 
@@ -226,6 +250,106 @@ Snapshots:   0 total
 Time:        3.16 s
 ```
 
+### 3.7 Automated Test Evidence
+
+#### Backend – Full Test Names (JUnit 5 @DisplayName)
+
+```
+TC-00: Spring context loads successfully
+TC-01: Register with valid data returns 200 and JWT token
+TC-02: Register with duplicate email returns 409 Conflict
+TC-03: Register with password mismatch returns 400
+TC-04: Login with valid credentials returns 200 and JWT
+TC-05: Login with wrong password returns 401
+TC-06: Login with unknown email returns 401
+TC-07: Access protected route without token returns 403
+TC-08: Create task with valid data returns 201
+TC-09: Get all tasks returns 200 with list
+TC-10: Update existing task returns 200
+TC-11: Delete task returns 204
+TC-12: Second user cannot delete first user's task (403)
+TC-13: Create group returns 201
+TC-14: Get user's groups returns 200 with list
+TC-15: Add member to group by email returns 200
+TC-16: Delete group by owner returns 204
+TC-17: Upload file returns 201 with file metadata
+TC-18: List uploaded files returns 200 with entries
+TC-19: Delete file returns 204 No Content
+TC-20: Valid JWT token grants access to protected endpoint
+TC-21: Expired JWT token is rejected with 403 Forbidden
+TC-22: Malformed JWT token is rejected with 403 Forbidden
+
+Tests run: 23, Failures: 0, Errors: 0, Skipped: 0
+BUILD SUCCESS — Total time: 15.571 s
+```
+
+> Full Surefire XML reports are generated at: `Backend/TaskFlow/target/surefire-reports/edu.cit.sala.TaskFlow.TaskFlowApplicationTests.xml`
+
+#### Web – Full Jest Output (Per Test)
+
+```
+ PASS  src/features/auth/Login.test.js
+  Login
+    ✓ renders email and password fields
+    ✓ renders Sign In button
+    ✓ shows error when email is empty
+    ✓ shows error when email format is invalid
+    ✓ shows error when password is missing
+    ✓ calls authApi.login and navigates on success
+    ✓ shows API error on wrong credentials
+
+ PASS  src/features/auth/Register.test.js
+  Register
+    ✓ renders "Create Account" heading
+    ✓ renders sign-up submit button
+    ✓ shows error when full name is empty
+    ✓ shows error when full name is too short
+    ✓ shows error when email is empty
+    ✓ shows error when passwords do not match
+    ✓ shows error when password is less than 8 characters
+    ✓ calls authApi.register and navigates to login on success
+    ✓ shows API error message on registration failure
+
+ PASS  src/features/dashboard/Dashboard.test.js
+  Dashboard
+    ✓ shows loading indicator while data is fetching
+    ✓ displays correct task counts after data loads
+    ✓ displays group names after data loads
+    ✓ shows welcome message with user fullName
+    ✓ shows fallback 'User' when fullName is missing
+
+ PASS  src/features/tasks/Tasks.test.js
+  Tasks
+    ✓ shows empty state message when no tasks exist
+    ✓ renders New Task button
+    ✓ opens create task modal when New Task button is clicked
+    ✓ filters tasks by search query
+    ✓ calls taskApi.create and refreshes list on save
+
+ PASS  src/features/groups/Groups.test.js
+  Groups
+    ✓ shows empty state message when no groups exist
+    ✓ renders group names from API
+    ✓ shows loading indicator while groups are fetching
+    ✓ shows error when group name is empty
+    ✓ shows error when group name is too short
+    ✓ shows error when group name is too short (min 2 chars)
+    ✓ calls groupApi.create with correct name and refreshes list
+
+Test Suites: 5 passed, 5 total
+Tests:       33 passed, 33 total
+Snapshots:   0 total
+Time:        3.16 s
+Ran all test suites.
+```
+
+#### Evidence Notes
+
+- **Test source**: All 23 backend tests are in `Backend/TaskFlow/src/test/java/edu/cit/sala/TaskFlow/TaskFlowApplicationTests.java`. All 33 web tests are in `web/src/features/*/` test files.
+- **Mocking strategy**: Web tests use `jest.mock()` to stub `authApi`, `taskApi`, and `groupApi`. Backend tests use Spring Boot Test with H2 in-memory database — no external dependencies.
+- **Test isolation**: Backend tests are ordered with `@TestMethodOrder(MethodOrderer.OrderAnnotation.class)` so that the JWT token from TC-01/TC-04 is reused across authenticated test cases.
+- **Coverage**: No code coverage tool was configured for this run. All 5 features (F-01 to F-05) and all functional endpoints are exercised by at least one automated test case.
+
 ---
 
 ## 4. Regression Analysis
@@ -257,6 +381,9 @@ Time:        3.16 s
 ## 5. Git History
 
 ```
+6f92fd5  (HEAD) docs: add web test cases (TC-W01-W33), automation labels, and test scripts to test plan
+3919235  docs: fix TC-17/TC-19 endpoint and status codes in test plan, update date to 2026
+38d17d9  docs: fix duplicate TC-W IDs in regression report (TC-W01 to TC-W33, all unique)
 4f10d38  test: add TC-17 to TC-22 (file management + JWT security tests, 23/23 passing)
 5d2163b  docs: update regression report to include 33 web frontend tests (total 50)
 73d8c1f  test: web frontend regression suite (33 tests, all passing)
