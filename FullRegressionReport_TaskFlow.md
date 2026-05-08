@@ -9,16 +9,16 @@
 
 ## 1. Executive Summary
 
-The vertical slice architecture refactoring of the TaskFlow project was completed across all three layers: **Backend (Spring Boot)**, **Web Frontend (React)**, and **Mobile (Android/Kotlin)**. A full regression test suite of **17 automated integration tests** was executed post-refactoring.
+The vertical slice architecture refactoring of the TaskFlow project was completed across all three layers: **Backend (Spring Boot)**, **Web Frontend (React)**, and **Mobile (Android/Kotlin)**. A full regression test suite of **50 automated tests** was executed post-refactoring — 17 JUnit 5 backend integration tests and 33 React (Jest + Testing Library) frontend unit/component tests.
 
-| Metric               | Value              |
-|----------------------|--------------------|
-| Total Tests Run      | 17                 |
-| Tests Passed         | 17                 |
-| Tests Failed         | 0                  |
-| Tests Skipped        | 0                  |
-| Build Result         | **BUILD SUCCESS**  |
-| Total Execution Time | ~14 seconds        |
+| Metric                  | Backend (JUnit 5) | Web Frontend (Jest) | Total            |
+|-------------------------|-------------------|---------------------|------------------|
+| Total Tests Run         | 17                | 33                  | **50**           |
+| Tests Passed            | 17                | 33                  | **50**           |
+| Tests Failed            | 0                 | 0                   | **0**            |
+| Tests Skipped           | 0                 | 0                   | **0**            |
+| Build / Test Result     | BUILD SUCCESS     | PASS (5 suites)     | ✅ **ALL PASS**  |
+| Total Execution Time    | ~14 s             | ~3.2 s              | ~17 s            |
 
 ---
 
@@ -105,7 +105,7 @@ com.example.mobile/
 
 ## 3. Test Execution Results
 
-### 3.1 Test Environment
+### 3.1 Backend Test Environment
 
 | Item              | Value                                      |
 |-------------------|--------------------------------------------|
@@ -117,7 +117,7 @@ com.example.mobile/
 | Test Framework    | JUnit 5 + Spring Boot Test + MockMvc       |
 | Branch            | `refactor/vertical-slice-architecture`     |
 
-### 3.2 Test Results Detail
+### 3.2 Backend Test Results Detail
 
 | TC-ID  | Test Name                                             | Status  | Expected HTTP | Actual HTTP |
 |--------|-------------------------------------------------------|---------|---------------|-------------|
@@ -155,6 +155,73 @@ com.example.mobile/
 
 ---
 
+### 3.4 Web Frontend Test Environment
+
+| Item              | Value                                          |
+|-------------------|------------------------------------------------|
+| OS                | Windows 11                                     |
+| Node.js           | 18.x                                           |
+| React             | 18.x (Create React App 5.0.1)                  |
+| Test Framework    | Jest 27 + @testing-library/react 16 + jsdom 16 |
+| User Events       | @testing-library/user-event 13.5.0             |
+| Router            | react-router-dom 7.x                           |
+| Branch            | `refactor/vertical-slice-architecture`         |
+
+### 3.5 Web Frontend Test Results Detail
+
+| TC-ID  | Test Suite          | Test Name                                                          | Status  |
+|--------|---------------------|--------------------------------------------------------------------|---------|
+| TC-W01 | Login               | renders email and password fields                                  | ✅ PASS |
+| TC-W01 | Login               | renders Sign In button                                             | ✅ PASS |
+| TC-W02 | Login               | shows error when email is empty                                    | ✅ PASS |
+| TC-W03 | Login               | shows error when email format is invalid                           | ✅ PASS |
+| TC-W04 | Login               | shows error when password is missing                               | ✅ PASS |
+| TC-W04 | Login               | calls authApi.login and navigates on success                       | ✅ PASS |
+| TC-W05 | Login               | shows API error on wrong credentials                               | ✅ PASS |
+| TC-W06 | Register            | renders "Create Account" heading                                   | ✅ PASS |
+| TC-W06 | Register            | renders sign-up submit button                                      | ✅ PASS |
+| TC-W07 | Register            | shows error when full name is empty                                | ✅ PASS |
+| TC-W07 | Register            | shows error when full name is too short                            | ✅ PASS |
+| TC-W07 | Register            | shows error when email is empty                                    | ✅ PASS |
+| TC-W08 | Register            | shows error when passwords do not match                            | ✅ PASS |
+| TC-W09 | Register            | shows error when password is less than 8 characters               | ✅ PASS |
+| TC-W10 | Register            | calls authApi.register and navigates to login on success           | ✅ PASS |
+| TC-W10 | Register            | shows API error message on registration failure                    | ✅ PASS |
+| TC-W11 | Dashboard           | shows loading indicator while data is fetching                     | ✅ PASS |
+| TC-W12 | Dashboard           | displays correct task counts after data loads                      | ✅ PASS |
+| TC-W12 | Dashboard           | displays group names after data loads                              | ✅ PASS |
+| TC-W13 | Dashboard           | shows welcome message with user fullName                           | ✅ PASS |
+| TC-W13 | Dashboard           | shows fallback 'User' when fullName is missing                     | ✅ PASS |
+| TC-W14 | Tasks               | shows empty state message when no tasks exist                      | ✅ PASS |
+| TC-W15 | Tasks               | renders New Task button                                            | ✅ PASS |
+| TC-W16 | Tasks               | opens create task modal when New Task button is clicked            | ✅ PASS |
+| TC-W17 | Tasks               | filters tasks by search query                                      | ✅ PASS |
+| TC-W18 | Tasks               | calls taskApi.create and refreshes list on save                    | ✅ PASS |
+| TC-W19 | Groups              | shows empty state message when no groups exist                     | ✅ PASS |
+| TC-W19 | Groups              | renders group names from API                                       | ✅ PASS |
+| TC-W20 | Groups              | shows loading indicator while groups are fetching                  | ✅ PASS |
+| TC-W21 | Groups              | shows error when group name is empty                               | ✅ PASS |
+| TC-W21 | Groups              | shows error when group name is too short                           | ✅ PASS |
+| TC-W21 | Groups              | shows error when group name is too short (validation)              | ✅ PASS |
+| TC-W22 | Groups              | calls groupApi.create with correct name and refreshes list         | ✅ PASS |
+
+### 3.6 Jest Test Output (abbreviated)
+
+```
+ PASS  src/features/auth/Login.test.js
+ PASS  src/features/auth/Register.test.js
+ PASS  src/features/dashboard/Dashboard.test.js
+ PASS  src/features/tasks/Tasks.test.js
+ PASS  src/features/groups/Groups.test.js
+
+Test Suites: 5 passed, 5 total
+Tests:       33 passed, 33 total
+Snapshots:   0 total
+Time:        3.16 s
+```
+
+---
+
 ## 4. Regression Analysis
 
 ### 4.1 Issues Found During Refactoring
@@ -167,19 +234,22 @@ com.example.mobile/
 
 ### 4.2 Regression Impact
 
-**No functional regressions detected.** All 17 test cases pass after the refactoring:
+**No functional regressions detected.** All 50 test cases pass after the refactoring:
 
-- Authentication flows (register, login, JWT) work correctly
-- Task CRUD operations maintain access control
+- Authentication flows (register, login, JWT) work correctly across backend and web
+- Task CRUD operations maintain access control (backend) and client-side filtering (web)
 - Group management with member addition works correctly
 - Security config properly rejects unauthenticated requests
 - Cross-feature dependencies (Task→User, GroupMember→User, FileEntity→User/Task) correctly resolved
+- React components render correctly after import path restructuring
+- All form validations in Login, Register, Tasks, and Groups work as expected
 
 ---
 
 ## 5. Git History
 
 ```
+73d8c1f  test: web frontend regression suite (33 tests, all passing)
 ff2d562  test: full regression suite (17 tests, all passing)
 1791b3c  refactor: vertical slice architecture for web frontend and mobile  
 a6c54d7  refactor: vertical slice architecture for backend
@@ -190,6 +260,6 @@ bf8aaa9  (origin/main) Changes: Edited groups & task including adding new settin
 
 ## 6. Conclusion
 
-The vertical slice architecture refactoring was completed successfully across all three layers of the TaskFlow application. The full regression suite of 17 automated integration tests confirms that no functionality was broken during the restructuring. The codebase now follows a feature-cohesive organization where each feature's controllers, services, entities, repositories, and DTOs are co-located, improving maintainability and scalability.
+The vertical slice architecture refactoring was completed successfully across all three layers of the TaskFlow application. The full regression suite of **50 automated tests** (17 JUnit 5 backend + 33 React frontend) confirms that no functionality was broken during the restructuring. The codebase now follows a feature-cohesive organization where each feature's controllers, services, entities, repositories, DTOs, and UI components are co-located, improving maintainability and scalability.
 
 **Final Status: PASS ✅**
