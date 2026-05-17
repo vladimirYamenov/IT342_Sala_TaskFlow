@@ -1,3 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">mobile</string>
+    <string name="app_name">TaskFlow</string>
+
+    <string-array name="task_statuses">
+        <item>All Statuses</item>
+        <item>To Do</item>
+        <item>In Progress</item>
+        <item>Completed</item>
+        <item>Pending</item>
+    </string-array>
+
+    <string-array name="task_priorities">
+        <item>All Priorities</item>
+        <item>High</item>
+        <item>Medium</item>
+        <item>Low</item>
+    </string-array>
 </resources>

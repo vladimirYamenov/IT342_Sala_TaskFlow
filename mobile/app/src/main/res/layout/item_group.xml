@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:background="@android:color/white"
+    android:padding="14dp"
+    android:layout_marginBottom="10dp"
+    android:elevation="2dp"
+    android:gravity="center_vertical">
+
+    <!-- Avatar circle (letter) -->
+    <TextView
+        android:id="@+id/tvGroupAvatar"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:background="#3B82F6"
+        android:textColor="@android:color/white"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:layout_marginEnd="12dp"/>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvGroupName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:textColor="#1E293B"/>
+
+        <TextView
+            android:id="@+id/tvMemberCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            android:textColor="#64748B"/>
+    </LinearLayout>
+
+    <!-- Leave button: shown only for non-owners (member/joined) -->
+    <Button
+        android:id="@+id/btnLeaveGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="32dp"
+        android:text="Leave"
+        android:textSize="11sp"
+        android:backgroundTint="#F59E0B"
+        android:textColor="@android:color/white"
+        android:layout_marginEnd="4dp"
+        android:visibility="gone"/>
+
+    <!-- Delete button: shown only for group owners -->
+    <ImageButton
+        android:id="@+id/btnDeleteGroup"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:src="@android:drawable/ic_menu_delete"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:tint="#EF4444"
+        android:visibility="gone"/>
+
+</LinearLayout>

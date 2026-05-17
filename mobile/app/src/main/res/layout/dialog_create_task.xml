@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:text="Title *" android:textSize="13sp" android:textColor="#374151" android:layout_marginBottom="2dp"/>
+    <EditText
+        android:id="@+id/etTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter task title (min 3 chars)"
+        android:maxLength="100"
+        android:inputType="textCapSentences"
+        android:layout_marginBottom="12dp"/>
+
+    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:text="Description" android:textSize="13sp" android:textColor="#374151" android:layout_marginBottom="2dp"/>
+    <EditText
+        android:id="@+id/etDescription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Optional description"
+        android:minLines="2"
+        android:maxLength="500"
+        android:inputType="textCapSentences|textMultiLine"
+        android:layout_marginBottom="12dp"/>
+
+    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:text="Priority" android:textSize="13sp" android:textColor="#374151" android:layout_marginBottom="2dp"/>
+    <Spinner
+        android:id="@+id/spinnerPriority"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"/>
+
+    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:text="Status" android:textSize="13sp" android:textColor="#374151" android:layout_marginBottom="2dp"/>
+    <Spinner
+        android:id="@+id/spinnerStatus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"/>
+
+    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:text="Due Date (YYYY-MM-DD)" android:textSize="13sp" android:textColor="#374151" android:layout_marginBottom="2dp"/>
+    <EditText
+        android:id="@+id/etDueDate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="e.g. 2026-06-30 (optional)"
+        android:inputType="date"
+        android:layout_marginBottom="4dp"/>
+
+</LinearLayout>

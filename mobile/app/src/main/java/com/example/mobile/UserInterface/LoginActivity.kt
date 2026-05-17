@@ -10,11 +10,9 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.mobile.API.ApiClient
-import com.example.mobile.MainActivity
 import com.example.mobile.R
 import com.example.mobile.model.LoginRequest
 import kotlinx.coroutines.launch
-
 
 class LoginActivity : AppCompatActivity() {
 
@@ -22,14 +20,14 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
-        val etEmail = findViewById<EditText>(R.id.etEmail)
+        val etEmail    = findViewById<EditText>(R.id.etEmail)
         val etPassword = findViewById<EditText>(R.id.etPassword)
-        val btnLogin = findViewById<Button>(R.id.btnLogin)
-        val tvError = findViewById<TextView>(R.id.tvError)
+        val btnLogin   = findViewById<Button>(R.id.btnLogin)
+        val tvError    = findViewById<TextView>(R.id.tvError)
         val tvRegister = findViewById<TextView>(R.id.tvRegister)
 
         btnLogin.setOnClickListener {
-            val email = etEmail.text.toString().trim()
+            val email    = etEmail.text.toString().trim()
             val password = etPassword.text.toString().trim()
 
             if (email.isEmpty() || password.isEmpty()) {
@@ -44,22 +42,22 @@ class LoginActivity : AppCompatActivity() {
 
             lifecycleScope.launch {
                 try {
-                    val response = ApiClient.authService.login(
-                        LoginRequest(email, password)
-                    )
+                    val response = ApiClient.authService.login(LoginRequest(email, password))
                     if (response.isSuccessful && response.body() != null) {
-                        getSharedPreferences("taskflow_prefs", MODE_PRIVATE)
-                            .edit()
-                            .putString("user_email", response.body()?.email)
+                        val body = response.body()!!
+
+                        // Save token in ApiClient for all future requests
+                        ApiClient.setToken(body.token)
+
+                        // Persist token + user info for next app launch
+                        getSharedPreferences("taskflow_prefs", MODE_PRIVATE).edit()
+                            .putString("token", body.token)
+                            .putString("user_email", body.email)
+                            .putString("user_full_name", body.fullName)
                             .apply()
 
-                        Toast.makeText(
-                            this@LoginActivity,
-                            "Login successful!",
-                            Toast.LENGTH_SHORT
-                        ).show()
-
-                        startActivity(Intent(this@LoginActivity, MainActivity::class.java))
+                        Toast.makeText(this@LoginActivity, "Welcome back!", Toast.LENGTH_SHORT).show()
+                        startActivity(Intent(this@LoginActivity, DashboardActivity::class.java))
                         finish()
                     } else {
                         tvError.text = "Invalid email or password."

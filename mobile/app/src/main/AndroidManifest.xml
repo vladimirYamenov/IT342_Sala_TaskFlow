@@ -16,6 +16,7 @@
         android:theme="@style/Theme.Mobile"
         tools:targetApi="31">
 
+        <!-- LAUNCHER: start at Register (first-time) -->
         <activity
             android:name=".UserInterface.RegisterActivity"
             android:exported="true">
@@ -25,13 +26,12 @@
             </intent-filter>
         </activity>
 
-        <activity
-            android:name=".UserInterface.LoginActivity"
-            android:exported="false"/>
+        <activity android:name=".UserInterface.LoginActivity"    android:exported="false"/>
+        <activity android:name=".UserInterface.DashboardActivity" android:exported="false"/>
+        <activity android:name=".UserInterface.TasksActivity"    android:exported="false"/>
+        <activity android:name=".UserInterface.GroupsActivity"   android:exported="false"/>
+        <activity android:name=".UserInterface.GroupDetailActivity" android:exported="false"/>
+        <activity android:name=".MainActivity"                   android:exported="false"/>
 
-        <activity
-            android:name=".MainActivity"
-            android:exported="false"/>
     </application>
-
 </manifest>
